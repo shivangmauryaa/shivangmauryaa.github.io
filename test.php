@@ -1,1 +1,3 @@
-<?php echo file_get_contents('/etc/passwd'); ?>
+<?php
+  echo "Hello, World!";
+?>
