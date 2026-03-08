@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Form Validation</title>
+
+<script type="text/javascript">
+function validate()
+{
+    var f = document.myform;
+
+    if(f.name.value == ""){
+        alert("Please enter your name");
+        f.name.focus();
+        return false;
+    }
+
+    if(f.email.value == ""){
+        alert("Please enter your email");
+        f.email.focus();
+        return false;
+    }
+
+    if(f.zip.value == "" || isNaN(f.zip.value) || f.zip.value.length != 5){
+        alert("Please enter a valid zip code");
+        f.zip.focus();
+        return false;
+    }
+
+    if(f.country.value == ""){
+        alert("Please select your country");
+        f.country.focus();
+        return false;
+    }
+
+    return true;
+}
+</script>
+
+</head>
+
+<body>
+<form name="myform" onsubmit="return validate();">
+
+<table cellpadding="2" border="1">
+
+<tr>
+<td align="right">Name:</td>
+<td><input type="text" name="name"></td>
+</tr>
+
+<tr>
+<td align="right">Email:</td>
+<td><input type="text" name="email"></td>
+</tr>
+
+<tr>
+<td align="right">Zip Code:</td>
+<td><input type="text" name="zip"></td>
+</tr>
+
+<tr>
+<td align="right">Country:</td>
+<td>
+<select name="country">
+<option value="">Select a country</option>
+<option value="US">United States</option>
+<option value="CA">Canada</option>
+<option value="UK">India</option>
+</select>
+</td>
+</tr>
+
+<tr>
+<td></td>
+<td><input type="submit" value="Submit"></td>
+</tr>
+
+</table>
+
+</form>
+</body>
+</html>
