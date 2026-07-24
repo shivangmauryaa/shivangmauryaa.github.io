@@ -14,6 +14,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
+  <link rel="preload" as="image" href="assets/examsphere-earth-hd.png" fetchpriority="high">
   <style>
     :root {
       --bg: #050505;
@@ -3287,29 +3288,1334 @@
       .proof-points i { animation: none !important; }
     }
   </style>
+  <style id="orbital-interface-v3">
+    :root {
+      --signal: #b9e8f5;
+      --signal-rgb: 185, 232, 245;
+      --violet: #b8b1f8;
+      --canvas: #050506;
+      --elevated: #0b0b0d;
+      --glass: rgba(16, 16, 19, .76);
+      --ease-orbit: cubic-bezier(.16, 1, .3, 1);
+      --hero-progress: 0;
+    }
+
+    html { scroll-padding-top: 92px; }
+
+    body {
+      background:
+        radial-gradient(900px 540px at 50% -260px, rgba(var(--signal-rgb), .055), transparent 70%),
+        var(--canvas);
+    }
+
+    body.chat-open { overflow: hidden; }
+
+    main,
+    .footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    main { overflow-x: clip; }
+
+    ::selection {
+      color: #060608;
+      background: var(--signal);
+    }
+
+    .skip:focus { z-index: 130; }
+
+    .site-ambient {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: .72;
+    }
+
+    .site-ambient i {
+      position: absolute;
+      display: block;
+      border-radius: 50%;
+      filter: blur(110px);
+      opacity: .055;
+      will-change: transform;
+    }
+
+    .ambient-one {
+      top: 18%;
+      left: -14%;
+      width: 540px;
+      height: 540px;
+      background: var(--signal);
+      animation: ambient-drift-a 22s ease-in-out infinite alternate;
+    }
+
+    .ambient-two {
+      top: 48%;
+      right: -17%;
+      width: 620px;
+      height: 620px;
+      background: var(--violet);
+      animation: ambient-drift-b 28s ease-in-out infinite alternate;
+    }
+
+    .ambient-three {
+      bottom: -20%;
+      left: 32%;
+      width: 480px;
+      height: 480px;
+      background: #fff;
+      animation: ambient-drift-c 25s ease-in-out infinite alternate;
+    }
+
+    .journey-rail {
+      position: fixed;
+      top: 50%;
+      right: 23px;
+      z-index: 24;
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      width: 28px;
+      color: #777772;
+      opacity: 0;
+      translate: 12px -50%;
+      transition: opacity .4s ease, translate .6s var(--ease-orbit);
+      pointer-events: none;
+    }
+
+    body.has-journey .journey-rail {
+      opacity: 1;
+      translate: 0 -50%;
+    }
+
+    .journey-index,
+    .journey-label {
+      font: 500 8px "DM Mono", monospace;
+      letter-spacing: .08em;
+      writing-mode: vertical-rl;
+    }
+
+    .journey-index {
+      color: #e8e8e3;
+      writing-mode: initial;
+    }
+
+    .journey-track {
+      position: relative;
+      width: 1px;
+      height: 112px;
+      overflow: hidden;
+      background: #ffffff12;
+    }
+
+    .journey-track i {
+      position: absolute;
+      inset: 0;
+      display: block;
+      background: linear-gradient(to bottom, var(--signal), var(--violet));
+      box-shadow: 0 0 12px rgba(var(--signal-rgb), .4);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform .18s linear;
+    }
+
+    .nav-wrap {
+      position: fixed;
+      top: 0;
+      z-index: 60;
+      transition: padding .35s var(--ease-orbit);
+    }
+
+    .nav {
+      height: 76px;
+      padding-inline: 2px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      transition:
+        width .6s var(--ease-orbit),
+        height .5s var(--ease-orbit),
+        margin .5s var(--ease-orbit),
+        padding .5s var(--ease-orbit),
+        background .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease;
+    }
+
+    .nav-wrap.is-scrolled .nav {
+      width: min(960px, calc(100% - 48px));
+      height: 58px;
+      margin-top: 10px;
+      padding-inline: 13px 8px;
+      border-color: #ffffff16;
+      background: rgba(8, 8, 10, .76);
+      box-shadow: 0 14px 55px #0008, inset 0 1px #ffffff09;
+      backdrop-filter: blur(22px) saturate(125%);
+    }
+
+    .nav-links a {
+      position: relative;
+      padding: 9px 2px;
+    }
+
+    .nav-links a:after {
+      position: absolute;
+      left: 50%;
+      bottom: 3px;
+      width: 0;
+      height: 1px;
+      content: "";
+      background: var(--signal);
+      box-shadow: 0 0 9px rgba(var(--signal-rgb), .6);
+      translate: -50% 0;
+      transition: width .35s var(--ease-orbit);
+    }
+
+    .nav-links a.is-active {
+      color: #f5f5f1;
+    }
+
+    .nav-links a.is-active:after { width: 16px; }
+
+    .brand-mark {
+      position: relative;
+      background:
+        radial-gradient(circle at 32% 27%, #fff 0 4%, #bdebf4 8%, #67666d 19%, #17171a 48%, #020203 64%, #bbb7ed 66%, #09090b 70%);
+      box-shadow: inset -4px -4px 7px #000, 0 0 20px rgba(var(--signal-rgb), .13);
+      animation: brand-breathe 4.8s ease-in-out infinite;
+    }
+
+    .workspace-login .workspace-label-short { display: none; }
+
+    .hero {
+      min-height: max(1040px, 112svh);
+      background:
+        radial-gradient(ellipse 48% 34% at 50% 78%, rgba(var(--signal-rgb), .075), transparent 70%),
+        radial-gradient(ellipse 38% 28% at 51% 76%, rgba(184, 177, 248, .045), transparent 74%),
+        #050506;
+    }
+
+    .hero:before {
+      background:
+        radial-gradient(580px circle at var(--mx) var(--my), rgba(var(--signal-rgb), .075), transparent 58%),
+        linear-gradient(to bottom, transparent 60%, #050506 95%);
+    }
+
+    .hero:after {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, transparent 0 6%, #ffffff08 6% calc(6% + 1px), transparent calc(6% + 1px) 94%, #ffffff08 94% calc(94% + 1px), transparent calc(94% + 1px)),
+        linear-gradient(to bottom, transparent 0 12%, #ffffff07 12% calc(12% + 1px), transparent calc(12% + 1px));
+      mask-image: linear-gradient(to bottom, #000 0, transparent 82%);
+    }
+
+    .hero-grid {
+      opacity: .34;
+      background-size: 72px 72px;
+      background-position: 0 var(--hero-grid-y, 0px);
+      mask-image: radial-gradient(ellipse 74% 65% at 50% 33%, #000, transparent 78%);
+    }
+
+    .signal-paths {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      opacity: .26;
+      pointer-events: none;
+      translate: 0 var(--hero-path-y, 0px);
+    }
+
+    .signal-paths path {
+      fill: none;
+      stroke: url(#signal-gradient);
+      stroke-width: .72;
+      stroke-dasharray: 10 15;
+      vector-effect: non-scaling-stroke;
+      animation: signal-flow 16s linear infinite;
+    }
+
+    .signal-paths path:nth-of-type(2) {
+      opacity: .5;
+      animation-duration: 22s;
+      animation-direction: reverse;
+    }
+
+    .signal-paths path:nth-of-type(3) {
+      opacity: .34;
+      animation-duration: 27s;
+    }
+
+    .hero-frame {
+      position: absolute;
+      inset: 96px 34px 30px;
+      z-index: 4;
+      pointer-events: none;
+      opacity: .45;
+    }
+
+    .hero-frame i {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      border-color: #ffffff24;
+      border-style: solid;
+    }
+
+    .hero-frame i:nth-child(1) { top: 0; left: 0; border-width: 1px 0 0 1px; }
+    .hero-frame i:nth-child(2) { top: 0; right: 0; border-width: 1px 1px 0 0; }
+    .hero-frame i:nth-child(3) { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+    .hero-frame i:nth-child(4) { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+
+    .hero-copy {
+      padding-top: 184px;
+      translate: 0 var(--hero-copy-y, 0px);
+      opacity: var(--hero-copy-opacity, 1);
+      will-change: translate, opacity;
+    }
+
+    .hero-copy .eyebrow {
+      color: #c0c0bb;
+      border-color: #ffffff1c;
+      background: rgba(8, 8, 10, .54);
+      box-shadow: inset 0 1px #ffffff08, 0 12px 36px #0005;
+    }
+
+    .hero-copy .eyebrow:before {
+      background: var(--signal);
+      box-shadow: 0 0 0 4px rgba(var(--signal-rgb), .07), 0 0 16px rgba(var(--signal-rgb), .65);
+      animation: signal-pulse 2.8s ease-in-out infinite;
+    }
+
+    .hero-title {
+      max-width: 1160px;
+      margin-top: 31px;
+      margin-bottom: 28px;
+      font-size: clamp(62px, 9.5vw, 138px);
+      letter-spacing: -.096em;
+      text-wrap: balance;
+    }
+
+    .hero-title .line {
+      white-space: nowrap;
+      overflow: visible;
+    }
+
+    .hero-title .char {
+      opacity: 0;
+      transform: translateY(110%) rotate(2deg);
+      filter: blur(8px);
+      animation: hero-char-enter 1.05s var(--ease-orbit) forwards;
+    }
+
+    .hero-title .line:nth-child(2) {
+      color: #85858a;
+      text-shadow: 0 0 65px rgba(184, 177, 248, .06);
+    }
+
+    .hero-title .line:nth-child(2) .char {
+      background: linear-gradient(118deg, #77777a 5%, #d8d7e4 44%, #9795b6 63%, #737378 92%);
+      background-size: 220% 100%;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation-name: hero-char-enter, title-sheen;
+      animation-duration: 1.05s, 9s;
+      animation-timing-function: var(--ease-orbit), ease-in-out;
+      animation-fill-mode: forwards;
+      animation-iteration-count: 1, infinite;
+    }
+
+    .hero-lede {
+      max-width: 560px;
+      color: #aaaab0;
+      font-size: 16px;
+      text-wrap: balance;
+    }
+
+    .button {
+      position: relative;
+      min-height: 44px;
+      padding-inline: 20px;
+      overflow: hidden;
+      isolation: isolate;
+      transition: background .25s, box-shadow .35s, border-color .3s, color .3s;
+    }
+
+    .button:before {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      content: "";
+      opacity: 0;
+      background: linear-gradient(110deg, transparent 25%, rgba(var(--signal-rgb), .22), transparent 70%);
+      translate: -110% 0;
+      transition: opacity .3s, translate .7s var(--ease-orbit);
+    }
+
+    .button:hover:before {
+      opacity: 1;
+      translate: 110% 0;
+    }
+
+    .button:hover {
+      box-shadow: 0 14px 42px rgba(var(--signal-rgb), .12), 0 0 0 1px rgba(var(--signal-rgb), .12);
+    }
+
+    .button.ghost:hover {
+      border-color: rgba(var(--signal-rgb), .24);
+      background: rgba(var(--signal-rgb), .07);
+    }
+
+    .sphere-stage {
+      bottom: -164px;
+      width: min(820px, 96vw);
+      translate: -50% var(--hero-stage-y, 0px);
+      scale: var(--hero-scale, 1);
+      opacity: var(--hero-visual-opacity, 1);
+      will-change: translate, scale, opacity;
+    }
+
+    .sphere-stage:before {
+      width: 110%;
+      border-color: rgba(var(--signal-rgb), .14);
+      box-shadow: 0 0 48px rgba(var(--signal-rgb), .055);
+    }
+
+    .sphere-stage:after {
+      border-color: rgba(184, 177, 248, .11);
+      box-shadow: inset 0 0 60px rgba(184, 177, 248, .025);
+    }
+
+    .sphere {
+      width: 72%;
+      overflow: hidden;
+      opacity: .96;
+      background:
+        url("assets/examsphere-earth-hd.png") center / 122% 122% no-repeat,
+        radial-gradient(circle at 31% 24%, #e8fbff, #16446e 30%, #05070a 72%);
+      filter: saturate(1.08) contrast(1.035);
+      box-shadow:
+        inset -24px -30px 70px rgba(0, 0, 0, .38),
+        0 0 0 1px rgba(118, 213, 255, .16),
+        0 0 85px rgba(42, 153, 255, .15),
+        0 0 210px rgba(42, 153, 255, .07);
+    }
+
+    .sphere:before {
+      inset: 0;
+      opacity: .72;
+      animation: none;
+      mix-blend-mode: normal;
+      background:
+        radial-gradient(circle at 29% 22%, rgba(224, 249, 255, .16), transparent 29%),
+        linear-gradient(125deg, transparent 48%, rgba(0, 0, 0, .08) 63%, rgba(0, 0, 0, .3) 88%);
+    }
+
+    .sphere:after {
+      inset: 0;
+      opacity: .58;
+      background:
+        radial-gradient(circle at 50% 50%, transparent 67%, rgba(36, 168, 255, .15) 70%, transparent 72%),
+        linear-gradient(125deg, transparent 38%, rgba(202, 244, 255, .11) 45%, transparent 52%);
+      filter: none;
+    }
+
+    .hero-command {
+      right: auto;
+      left: 50%;
+      top: 43%;
+      width: min(466px, 58vw);
+      margin: 0;
+      border-color: rgba(var(--signal-rgb), .16);
+      background:
+        radial-gradient(circle at 12% 0, rgba(var(--signal-rgb), .05), transparent 42%),
+        linear-gradient(135deg, rgba(20, 20, 23, .9), rgba(6, 6, 8, .8));
+      box-shadow: 0 32px 100px #000c, inset 0 1px #ffffff10, 0 0 50px rgba(var(--signal-rgb), .035);
+      transform: translateX(-50%) perspective(900px) rotateX(4deg) rotateY(-4deg);
+    }
+
+    .hero-command-top i,
+    .proof-points i {
+      background: var(--signal);
+    }
+
+    .hero-command-track span {
+      background: linear-gradient(90deg, var(--signal), #d2d0e6);
+      box-shadow: 0 0 11px rgba(var(--signal-rgb), .22);
+    }
+
+    .hero-readiness strong { text-shadow: 0 0 22px rgba(var(--signal-rgb), .12); }
+
+    .hero-telemetry {
+      position: absolute;
+      right: 48px;
+      bottom: 43px;
+      z-index: 5;
+      display: flex;
+      gap: 24px;
+      color: #66666b;
+      font: 500 8px "DM Mono", monospace;
+      letter-spacing: .07em;
+    }
+
+    .hero-telemetry span { display: inline-flex; align-items: center; gap: 7px; }
+
+    .hero-telemetry i {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 10px rgba(var(--signal-rgb), .7);
+    }
+
+    .scroll-cue {
+      left: 48px;
+      bottom: 39px;
+      color: #656569;
+      translate: 0;
+    }
+
+    .scroll-cue i {
+      background: linear-gradient(to bottom, var(--signal), transparent);
+    }
+
+    .marquee {
+      position: relative;
+      z-index: 2;
+      height: 70px;
+      background: rgba(6, 6, 8, .8);
+      backdrop-filter: blur(10px);
+    }
+
+    .progress { height: 1px; }
+
+    .progress i {
+      background: linear-gradient(90deg, var(--signal), var(--violet));
+      box-shadow: 0 0 14px rgba(var(--signal-rgb), .55);
+    }
+
+    .marquee:before,
+    .marquee:after {
+      position: absolute;
+      inset: 0 auto 0 0;
+      z-index: 2;
+      width: 12vw;
+      content: "";
+      background: linear-gradient(90deg, #050506, transparent);
+      pointer-events: none;
+    }
+
+    .marquee:after {
+      right: 0;
+      left: auto;
+      rotate: 180deg;
+    }
+
+    .marquee b { color: #c0c0c2; }
+
+    .proof-band {
+      position: relative;
+      overflow: hidden;
+      background: rgba(7, 7, 9, .92);
+    }
+
+    .proof-band:after {
+      position: absolute;
+      top: 0;
+      left: var(--proof-x, 50%);
+      width: 260px;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, transparent, var(--signal), transparent);
+      translate: -50% 0;
+      box-shadow: 0 0 18px rgba(var(--signal-rgb), .38);
+    }
+
+    .section,
+    .chapter,
+    .insight {
+      position: relative;
+      scroll-margin-top: 82px;
+      isolation: isolate;
+    }
+
+    .section:after,
+    .chapter:after,
+    .insight:after {
+      position: absolute;
+      z-index: -1;
+      width: 760px;
+      height: 760px;
+      border-radius: 50%;
+      content: "";
+      opacity: .055;
+      filter: blur(100px);
+      pointer-events: none;
+      background: var(--scene-color, var(--signal));
+      translate: 0 var(--scene-shift, 0px);
+    }
+
+    .section:after { top: 12%; right: -46%; }
+    .chapter:after { top: -12%; left: -28%; --scene-color: var(--violet); }
+    .insight:after { right: -26%; bottom: -40%; }
+
+    .display {
+      letter-spacing: -.078em;
+      text-wrap: balance;
+    }
+
+    .display em {
+      color: #838389;
+      text-shadow: 0 0 34px rgba(184, 177, 248, .035);
+    }
+
+    .eyebrow { color: #929296; }
+
+    .eyebrow:before {
+      background: var(--signal);
+      box-shadow: 0 0 0 4px rgba(var(--signal-rgb), .055);
+    }
+
+    .section {
+      padding-block: clamp(104px, 9vw, 132px);
+    }
+
+    .reveal {
+      opacity: .14;
+      clip-path: inset(0 0 5% 0);
+      filter: blur(4px);
+      transform: translate3d(0, 22px, 0) scale(.994);
+      transition:
+        opacity .82s var(--ease-orbit) var(--reveal-delay, 0ms),
+        transform .9s var(--ease-orbit) var(--reveal-delay, 0ms),
+        filter .82s var(--ease-orbit) var(--reveal-delay, 0ms),
+        clip-path .9s var(--ease-orbit) var(--reveal-delay, 0ms);
+    }
+
+    .reveal.in {
+      opacity: 1;
+      clip-path: inset(0);
+      filter: none;
+      transform: none;
+    }
+
+    .intro,
+    .planner-head,
+    .story-intro {
+      position: relative;
+    }
+
+    .intro:before,
+    .planner-head:before {
+      position: absolute;
+      top: -62px;
+      left: 0;
+      width: 54px;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, var(--signal), transparent);
+      transform: scaleX(var(--line-progress, 0));
+      transform-origin: left;
+      box-shadow: 0 0 12px rgba(var(--signal-rgb), .25);
+      transition: transform 1s var(--ease-orbit);
+    }
+
+    .scroll-scene.is-visible .intro:before,
+    .scroll-scene.is-visible .planner-head:before { --line-progress: 1; }
+
+    .showcase,
+    .planner-stage,
+    .ai-workspace,
+    .insight-art,
+    .story-large,
+    .result,
+    .principle,
+    .cta {
+      border-color: #ffffff12;
+      box-shadow: inset 0 1px #ffffff08, 0 34px 110px #0003;
+    }
+
+    .showcase {
+      background:
+        radial-gradient(circle at var(--spot-x, 78%) var(--spot-y, 18%), rgba(var(--signal-rgb), .075), transparent 30%),
+        linear-gradient(135deg, #0d0d10, #08080a 65%);
+    }
+
+    .spotlight-glow {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: block;
+      border-radius: inherit;
+      opacity: 0;
+      background: radial-gradient(360px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(var(--signal-rgb), .075), transparent 62%);
+      transition: opacity .35s ease;
+      pointer-events: none;
+    }
+
+    [data-spotlight]:hover > .spotlight-glow { opacity: 1; }
+
+    [data-spotlight] > *:not(.spotlight-glow) { z-index: 1; }
+
+    .showcase-copy {
+      border-right-color: #ffffff0d;
+      background: linear-gradient(160deg, rgba(255, 255, 255, .018), transparent);
+    }
+
+    .console {
+      translate: 0 var(--scene-shift-inverse, 0px);
+      will-change: translate;
+    }
+
+    .console-shell {
+      border-color: rgba(var(--signal-rgb), .13);
+      background:
+        linear-gradient(rgba(255,255,255,.018), rgba(255,255,255,0)),
+        #09090b;
+      box-shadow: 0 26px 70px #0007, 0 0 0 1px #ffffff04 inset;
+    }
+
+    .console-mode,
+    .ai-prompt-option {
+      min-height: 30px;
+    }
+
+    .console-mode:hover,
+    .console-mode.is-active,
+    .ai-prompt-option:hover,
+    .ai-prompt-option.is-active {
+      color: #08080a;
+      background: var(--signal);
+      border-color: var(--signal);
+      box-shadow: 0 0 18px rgba(var(--signal-rgb), .13);
+    }
+
+    .focus-ring {
+      background: conic-gradient(var(--signal) 0 86%, #202023 86%);
+      box-shadow: 0 0 32px rgba(var(--signal-rgb), .07);
+    }
+
+    .chapter {
+      background:
+        radial-gradient(ellipse 50% 50% at 22% 45%, rgba(184, 177, 248, .045), transparent 72%),
+        #08080a;
+    }
+
+    .ai-workspace {
+      overflow: hidden;
+      translate: 0 var(--scene-shift, 0px);
+      border-color: rgba(184, 177, 248, .13);
+      background:
+        radial-gradient(circle at var(--spot-x, 78%) var(--spot-y, 20%), rgba(184, 177, 248, .065), transparent 32%),
+        #0b0b0d;
+      will-change: translate;
+    }
+
+    .terminal-head .status i {
+      background: var(--signal);
+      box-shadow: 0 0 10px rgba(var(--signal-rgb), .7);
+    }
+
+    .typing-line:after { background: var(--signal); }
+
+    .flash-card {
+      border-color: #ffffff10;
+      background: #0d0d0f;
+    }
+
+    .flash-card:hover,
+    .flash-card.known {
+      background: #e9f3f4;
+    }
+
+    .planner-stage {
+      overflow: hidden;
+      background:
+        radial-gradient(circle at var(--spot-x, 64%) var(--spot-y, 12%), rgba(var(--signal-rgb), .055), transparent 34%),
+        #09090b;
+    }
+
+    .calendar-panel {
+      translate: var(--scene-shift-x, 0px) 0;
+      will-change: translate;
+    }
+
+    .week-plan {
+      translate: var(--scene-shift-x-inverse, 0px) 0;
+      will-change: translate;
+    }
+
+    .week-plan:after {
+      opacity: 0;
+      animation: none;
+    }
+
+    .planner-stage.in .week-plan:after {
+      animation: timeline-pass 1.9s .55s var(--ease-orbit) both;
+    }
+
+    .session-line {
+      opacity: .36;
+      translate: 18px 0;
+      transition: opacity .7s var(--ease-orbit), translate .7s var(--ease-orbit);
+    }
+
+    .planner-stage.in .session-line {
+      opacity: 1;
+      translate: 0;
+    }
+
+    .planner-stage.in .session-line:nth-child(2) { transition-delay: .18s; }
+    .planner-stage.in .session-line:nth-child(3) { transition-delay: .31s; }
+    .planner-stage.in .session-line:nth-child(4) { transition-delay: .44s; }
+
+    .calendar-days .active {
+      color: #070709;
+      background: var(--signal);
+      box-shadow: 0 0 24px rgba(var(--signal-rgb), .15);
+    }
+
+    .insight {
+      background:
+        radial-gradient(ellipse 48% 70% at 75% 50%, rgba(var(--signal-rgb), .045), transparent 75%),
+        #070708;
+    }
+
+    .insight-art {
+      translate: 0 var(--scene-shift-inverse, 0px);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(var(--signal-rgb), .045), transparent 52%),
+        #0a0a0c;
+      will-change: translate;
+    }
+
+    .radar .fill {
+      fill: rgba(var(--signal-rgb), .07);
+      stroke: var(--signal);
+      filter: drop-shadow(0 0 8px rgba(var(--signal-rgb), .16));
+    }
+
+    .principles {
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      border: 0;
+    }
+
+    .principle {
+      min-height: 270px;
+      margin: 0;
+      padding: 25px;
+      border: 1px solid #ffffff11;
+      border-radius: 18px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at var(--spot-x, 70%) var(--spot-y, 15%), rgba(var(--signal-rgb), .055), transparent 42%),
+        #0a0a0c;
+    }
+
+    .principle:nth-child(1) { grid-column: span 5; }
+    .principle:nth-child(2) { grid-column: span 3; }
+    .principle:nth-child(3) { grid-column: span 4; }
+
+    .principle h3 {
+      margin-top: 82px;
+      font-size: 23px;
+    }
+
+    .principle .step { color: #929297; }
+
+    .story-large {
+      border-color: rgba(184, 177, 248, .12);
+      background:
+        radial-gradient(circle at var(--spot-x, 83%) var(--spot-y, 20%), rgba(184, 177, 248, .08), transparent 30%),
+        #0d0d0f;
+    }
+
+    .quote-text {
+      translate: 0 var(--scene-shift-soft, 0px);
+      will-change: translate;
+    }
+
+    .result {
+      background:
+        radial-gradient(circle at var(--spot-x, 82%) var(--spot-y, 15%), rgba(var(--signal-rgb), .06), transparent 38%),
+        #0a0a0c;
+    }
+
+    .result .big-number {
+      animation: none;
+      color: #f5f5f2;
+      text-shadow: 0 0 30px rgba(var(--signal-rgb), .055);
+    }
+
+    .result .measure {
+      background: linear-gradient(90deg, var(--signal), #d0caef);
+      box-shadow: 0 0 14px rgba(var(--signal-rgb), .16);
+      animation-duration: 5s;
+    }
+
+    .faq-layout {
+      grid-template-columns: minmax(0, .38fr) minmax(0, .62fr);
+      gap: clamp(42px, 5vw, 70px);
+    }
+
+    .faq-list details {
+      position: relative;
+      border-bottom-color: #ffffff10;
+      transition: background .3s, padding .4s var(--ease-orbit), border-color .3s;
+    }
+
+    .faq-list details[open] {
+      margin-inline: -16px;
+      padding-inline: 16px;
+      border-color: rgba(var(--signal-rgb), .12);
+      background: linear-gradient(90deg, rgba(var(--signal-rgb), .035), transparent 64%);
+    }
+
+    .faq-list summary:after { color: var(--signal); }
+
+    .cta {
+      isolation: isolate;
+      overflow: hidden;
+      border-color: rgba(var(--signal-rgb), .13);
+      background:
+        radial-gradient(ellipse 72% 120% at 50% 115%, rgba(var(--signal-rgb), .09), transparent 55%),
+        #0a0a0c;
+    }
+
+    .cta:before {
+      inset: auto 50% -82% auto;
+      z-index: 0;
+      width: min(760px, 100%);
+      aspect-ratio: 1;
+      border: 1px solid rgba(var(--signal-rgb), .15);
+      border-radius: 50%;
+      background:
+        repeating-radial-gradient(circle, transparent 0 44px, #ffffff08 45px 46px),
+        radial-gradient(circle at 38% 30%, rgba(var(--signal-rgb), .13), #0b0b0e 28%, #030304 68%);
+      box-shadow: inset -50px -60px 120px #000, 0 0 90px rgba(var(--signal-rgb), .055);
+      translate: 50% 0;
+      animation: cta-horizon 12s ease-in-out infinite alternate;
+    }
+
+    .cta-content { position: relative; z-index: 2; }
+
+    .chat-launch {
+      border-color: rgba(var(--signal-rgb), .2);
+      box-shadow: 0 12px 45px #0009, 0 0 32px rgba(var(--signal-rgb), .08);
+    }
+
+    .chat-launch:after {
+      position: absolute;
+      inset: -6px;
+      border: 1px solid rgba(var(--signal-rgb), .13);
+      border-radius: 50%;
+      content: "";
+      animation: launch-ring 3.2s ease-out infinite;
+    }
+
+    .chat-root[data-open="true"] .chat-panel {
+      border-color: rgba(var(--signal-rgb), .14);
+      background:
+        radial-gradient(circle at 55% 25%, rgba(var(--signal-rgb), .035), transparent 45%),
+        #09090b;
+    }
+
+    .chat-panel {
+      visibility: hidden;
+      transition:
+        opacity .28s ease,
+        transform .34s var(--ease-orbit),
+        visibility 0s linear .34s;
+    }
+
+    .chat-root[data-open="true"] .chat-panel {
+      visibility: visible;
+      transition-delay: 0s;
+    }
+
+    .chat-earth {
+      background:
+        url("assets/examsphere-earth-hd.png") center / 125% 125% no-repeat,
+        #020305 !important;
+      filter: saturate(1.12) contrast(1.04);
+      box-shadow:
+        inset -24px -28px 58px rgba(0, 0, 0, .46),
+        0 0 0 1px rgba(112, 213, 255, .16),
+        0 0 72px rgba(38, 160, 255, .16) !important;
+    }
+
+    .chat-root[data-open="true"] .chat-earth {
+      animation: chat-earth-breathe 8s ease-in-out infinite;
+    }
+
+    body.hero-away .signal-paths path,
+    body.hero-away .hero-command,
+    body.hero-away .sphere-stage:before,
+    body.hero-away .sphere-stage:after,
+    .scroll-scene:not(.is-visible) .console-shell:after,
+    .scroll-scene:not(.is-visible) .result .measure,
+    .scroll-scene:not(.is-visible) .radar,
+    .scroll-scene:not(.is-visible) .radar-caption {
+      animation-play-state: paused !important;
+    }
+
+    @keyframes ambient-drift-a {
+      to { transform: translate3d(22vw, 14vh, 0) scale(1.2); }
+    }
+
+    @keyframes ambient-drift-b {
+      to { transform: translate3d(-23vw, 8vh, 0) scale(.88); }
+    }
+
+    @keyframes ambient-drift-c {
+      to { transform: translate3d(10vw, -18vh, 0) scale(1.12); }
+    }
+
+    @keyframes chat-earth-breathe {
+      50% { filter: saturate(1.18) contrast(1.06) brightness(1.06); }
+    }
+
+    @keyframes brand-breathe {
+      50% { box-shadow: inset -4px -4px 7px #000, 0 0 28px rgba(var(--signal-rgb), .22); }
+    }
+
+    @keyframes signal-flow {
+      to { stroke-dashoffset: -200; }
+    }
+
+    @keyframes hero-char-enter {
+      to { opacity: 1; transform: none; filter: none; }
+    }
+
+    @keyframes title-sheen {
+      0%, 30% { background-position: 100% 0; }
+      70%, 100% { background-position: 0 0; }
+    }
+
+    @keyframes signal-pulse {
+      50% { opacity: .55; box-shadow: 0 0 0 7px rgba(var(--signal-rgb), .025), 0 0 22px rgba(var(--signal-rgb), .55); }
+    }
+
+    @keyframes timeline-pass {
+      0% { translate: 0 0; opacity: 0; }
+      14% { opacity: 1; }
+      100% { translate: 0 202px; opacity: .5; }
+    }
+
+    @keyframes cta-horizon {
+      to { translate: 50% -18px; rotate: 2deg; }
+    }
+
+    @keyframes launch-ring {
+      0% { opacity: .5; scale: .86; }
+      75%, 100% { opacity: 0; scale: 1.25; }
+    }
+
+    @media (max-width: 1100px) {
+      .journey-rail { display: none; }
+      .hero-telemetry span:nth-child(2) { display: none; }
+      .hero-frame { inset-inline: 24px; }
+    }
+
+    @media (max-width: 880px) {
+      .nav-wrap.is-scrolled .nav,
+      .nav {
+        width: calc(100% - 34px);
+      }
+
+      .nav-wrap.is-scrolled .nav {
+        padding-inline: 11px 7px;
+      }
+
+      .nav-drawer {
+        visibility: hidden;
+        transition: opacity .28s ease, translate .35s var(--ease-orbit), visibility 0s linear .35s;
+      }
+
+      .nav-wrap[data-open="true"] .nav-drawer {
+        visibility: visible;
+        transition-delay: 0s;
+      }
+
+      .hero { min-height: 940px; }
+      .hero-copy { padding-top: 156px; }
+      .hero-command { top: 41%; width: min(430px, 72vw); }
+      .hero-telemetry { right: 24px; }
+      .principle:nth-child(1),
+      .principle:nth-child(2),
+      .principle:nth-child(3) { grid-column: span 4; }
+      .faq-layout { grid-template-columns: 1fr; gap: 40px; }
+      .planner-head { grid-template-columns: 1fr; gap: 26px; }
+      .planner-head .body-copy { margin: 0; max-width: 560px; }
+    }
+
+    @media (max-width: 560px) {
+      html { scroll-padding-top: 74px; }
+
+      .site-ambient { opacity: .42; }
+      .nav-wrap { padding-top: 0; }
+
+      .nav.container,
+      .nav-wrap.is-scrolled .nav {
+        width: calc(100% - 28px);
+        margin-inline: auto;
+      }
+
+      .nav {
+        height: 66px;
+        padding-inline: 0;
+      }
+
+      .nav-wrap.is-scrolled .nav {
+        height: 54px;
+        margin-top: 7px;
+        padding-inline: 10px 6px;
+      }
+
+      .brand { font-size: 13px; }
+      .brand-mark { width: 18px; height: 18px; }
+      .workspace-login .workspace-label-full { display: none; }
+      .workspace-login .workspace-label-short { display: inline-block; }
+
+      .workspace-login {
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        padding-inline: 8px;
+        font-size: 8px;
+      }
+
+      .nav-menu {
+        min-width: 58px;
+        min-height: 42px;
+        padding-inline: 8px;
+      }
+
+      .nav-drawer {
+        top: 68px;
+        width: calc(100% - 28px);
+      }
+
+      .nav-drawer a { min-height: 58px; }
+
+      .hero {
+        min-height: 875px;
+        height: auto;
+      }
+
+      .hero:after { display: none; }
+      .hero-frame { inset: 78px 14px 18px; opacity: .25; }
+      .signal-paths { opacity: .18; }
+
+      .hero-copy {
+        width: calc(100% - 34px);
+        padding-top: 118px;
+      }
+
+      .hero-title {
+        margin-top: 24px;
+        font-size: clamp(39px, 12.3vw, 52px);
+        line-height: .92;
+        letter-spacing: -.085em;
+      }
+
+      .hero-title .line {
+        white-space: normal;
+        overflow: visible;
+      }
+
+      .hero-lede {
+        max-width: 330px;
+        font-size: 13px;
+      }
+
+      .hero-actions {
+        width: calc(100vw - 34px);
+        max-width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .hero-actions .button {
+        width: auto;
+        max-width: 100%;
+        min-height: 48px;
+      }
+
+      .sphere-stage {
+        bottom: -116px;
+        width: 470px;
+      }
+
+      .sphere { width: 73%; }
+
+      .hero-command {
+        right: auto;
+        left: 50%;
+        top: 24%;
+        width: calc(100vw - 34px);
+        max-width: 340px;
+        margin: 0;
+        transform: translateX(-50%);
+      }
+
+      .hero-command-body { padding-inline: 14px; }
+      .hero-command-copy { min-width: 0; }
+      .hero-command-copy b,
+      .hero-command-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+      .hero-telemetry,
+      .scroll-cue { display: none; }
+
+      .marquee { height: 56px; }
+      .proof-band-inner { gap: 16px; }
+      .proof-points { display: grid; grid-template-columns: 1fr; }
+
+      .section,
+      .chapter { overflow: hidden; }
+
+      .section { padding-block: 76px; }
+
+      .section:after,
+      .chapter:after,
+      .insight:after { width: 380px; height: 380px; }
+
+      .reveal {
+        transform: translate3d(0, 24px, 0) scale(.992);
+        filter: blur(4px);
+      }
+
+      .console,
+      .ai-workspace,
+      .insight-art,
+      .calendar-panel,
+      .week-plan,
+      .quote-text { translate: none; }
+
+      .console-mode,
+      .ai-prompt-option {
+        min-height: 34px;
+      }
+
+      .principles {
+        grid-template-columns: 1fr;
+        gap: 9px;
+      }
+
+      .principle:nth-child(1),
+      .principle:nth-child(2),
+      .principle:nth-child(3) { grid-column: auto; }
+
+      .principle {
+        min-height: 210px;
+        padding: 22px;
+      }
+
+      .principle h3 { margin-top: 50px; }
+      .cta:before { bottom: -53%; width: 460px; }
+
+      .chat-launch {
+        width: 54px;
+        height: 54px;
+        right: 15px;
+        bottom: 15px;
+      }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .magnetic,
+      .tilt { transform: none !important; }
+      [data-spotlight] > .spotlight-glow { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-ambient i,
+      .brand-mark,
+      .signal-paths path,
+      .hero-title .char,
+      .hero-title .line:nth-child(2) .char,
+      .hero-copy .eyebrow:before,
+      .cta:before,
+      .chat-launch:after,
+      .planner-stage.in .week-plan:after {
+        animation: none !important;
+      }
+
+      .chat-root[data-open="true"] .chat-earth {
+        animation: none !important;
+      }
+
+      .hero-title .char {
+        opacity: 1;
+        transform: none;
+        filter: none;
+      }
+
+      .reveal,
+      .session-line {
+        opacity: 1 !important;
+        transform: none !important;
+        translate: none !important;
+        filter: none !important;
+        clip-path: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="site-ambient" aria-hidden="true">
+    <i class="ambient-one"></i><i class="ambient-two"></i><i class="ambient-three"></i>
+  </div>
+  <aside class="journey-rail" aria-hidden="true">
+    <span class="journey-index" id="journey-index">00</span>
+    <div class="journey-track"><i id="journey-progress"></i></div>
+    <span class="journey-label" id="journey-label">ORBIT</span>
+  </aside>
   <div class="progress" aria-hidden="true"><i></i></div>
   <a href="#main" class="skip">Skip to content</a>
+  <div class="nav-wrap">
+    <nav class="nav container" aria-label="Primary navigation"><a class="brand" href="#top"><span class="brand-mark"
+          aria-hidden="true"></span>ExamSphere</a>
+      <div class="nav-links"><a href="#experience">Experience</a><a href="#intelligence">Intelligence</a><a
+          href="#outcomes">Outcomes</a><a href="#faq">FAQ</a></div>
+      <div class="nav-actions"><a class="workspace-login" href="/login"><span class="workspace-label-full">Login workspace</span><span class="workspace-label-short">Login</span>
+          <span>↗</span></a><a class="button magnetic nav-join" href="#ai-chat" data-chat-trigger>Start exploring
+          <span class="arrow">→</span></a><button class="nav-menu" type="button" aria-expanded="false"
+          aria-controls="nav-drawer"><span>Menu</span><i aria-hidden="true"></i></button></div>
+    </nav>
+    <div class="nav-drawer container" id="nav-drawer" aria-hidden="true"><a href="#experience">The experience</a><a
+        href="#intelligence">AI study partner</a><a href="#planner">Planning</a><a href="#insights">Readiness</a><a
+        href="#faq">Answers</a></div>
+  </div>
   <main id="main">
     <section class="hero" id="top" aria-label="ExamSphere introduction">
       <canvas id="particles" aria-hidden="true"></canvas>
       <div class="hero-grid"></div>
-      <div class="nav-wrap">
-        <nav class="nav container" aria-label="Primary navigation"><a class="brand" href="#top"><span class="brand-mark"
-              aria-hidden="true"></span>ExamSphere</a>
-          <div class="nav-links"><a href="#experience">Experience</a><a href="#intelligence">Intelligence</a><a
-              href="#outcomes">Outcomes</a><a href="#faq">FAQ</a></div>
-          <div class="nav-actions"><a class="workspace-login" href="/login">Login workspace
-              <span>↗</span></a><a class="button magnetic nav-join" href="#ai-chat" data-chat-trigger>Start exploring
-              <span class="arrow">→</span></a><button class="nav-menu" type="button" aria-expanded="false"
-              aria-controls="nav-drawer"><span>Menu</span><i aria-hidden="true"></i></button></div>
-        </nav>
-        <div class="nav-drawer container" id="nav-drawer" aria-hidden="true"><a href="#experience">The experience</a><a
-            href="#intelligence">AI study partner</a><a href="#planner">Planning</a><a href="#insights">Readiness</a><a
-            href="#faq">Answers</a></div>
-      </div>
+      <svg class="signal-paths" viewBox="0 0 1440 980" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="signal-gradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#8fe9ff" stop-opacity="0" />
+            <stop offset=".46" stop-color="#b6adff" stop-opacity=".56" />
+            <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M-80 736C188 572 335 814 548 638S920 351 1190 468s300-51 360-117" />
+        <path d="M-42 230C179 354 342 151 572 295s382 278 601 138 302-71 388-9" />
+        <path d="M202 104C426 220 460 511 721 500s325-293 551-225" />
+      </svg>
+      <div class="hero-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="hero-copy container"><span class="eyebrow">The future of exam preparation</span>
         <h1 class="hero-title" aria-label="Study in your own orbit"><span class="line split">Study in your</span><span
             class="line split">own orbit.</span></h1>
@@ -3332,6 +4638,9 @@
           </div>
           <div class="hero-command-track"><span></span><i></i><i></i><i></i><i></i><i></i></div>
         </div>
+      </div>
+      <div class="hero-telemetry" aria-hidden="true">
+        <span><i></i> ADAPTIVE STUDY OS</span><span>FOCUS SIGNAL / 98.4</span><span>SEMESTER SYNC / LIVE</span>
       </div>
       <div class="scroll-cue"><i></i> Scroll to enter</div>
     </section>
@@ -3374,7 +4683,7 @@
                   data-console-mode="review" aria-selected="false">REVIEW</button></div><span>08:42</span></div>
             <div class="console-body">
               <aside class="console-side"><span></span><span></span><span></span><span></span><span></span></aside>
-              <div class="console-main">
+              <div class="console-main" id="console-panel" role="tabpanel" tabindex="0">
                 <div class="console-kicker" data-console-kicker>THURSDAY · 12 SEPTEMBER</div>
                 <div class="console-heading" data-console-heading>Your focus has a direction.</div>
                 <div class="live-stats">
@@ -3421,7 +4730,7 @@
                   type="button" class="ai-prompt-option" data-ai-preset="explain" aria-selected="false">EXPLAIN</button><button
                   type="button" class="ai-prompt-option" data-ai-preset="quiz" aria-selected="false">QUIZ</button></div>
             </div>
-            <div class="response">
+            <div class="response" id="ai-demo-panel" role="tabpanel" tabindex="0">
               <div class="response-title">EXAMSPHERE HAS A PLAN</div>
               <div class="typing-line" id="typed-response" aria-live="polite"></div>
               <div class="flash-deck" id="flash-deck" aria-label="AI-generated flashcards"><button class="flash-card"
@@ -3675,14 +4984,12 @@
         const text = el.textContent;
         el.innerHTML = [...text].map((char, index) => '<span class="char" style="animation-delay:' + ((lineIndex * .12) + (index * .028)) + 's">' + (char === ' ' ? '&nbsp;' : char) + '</span>').join('');
       });
-      const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('in'); observer.unobserve(entry.target); } }), { threshold: .13 });
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('in'); observer.unobserve(entry.target); } }), { threshold: .025, rootMargin: '0px 0px 24% 0px' });
       document.querySelectorAll('.reveal').forEach(el => {
-        if (el.getBoundingClientRect().top < innerHeight * .96) el.classList.add('in');
+        if (el.getBoundingClientRect().top < innerHeight * 1.18) el.classList.add('in');
         observer.observe(el);
       });
       const progress = document.querySelector('.progress i');
-      const updateProgress = () => { const range = document.documentElement.scrollHeight - innerHeight; progress.style.width = (range ? scrollY / range * 100 : 0) + '%'; };
-      addEventListener('scroll', updateProgress, { passive: true }); updateProgress();
       const navWrap = document.querySelector('.nav-wrap');
       const navMenu = document.querySelector('.nav-menu');
       const navDrawer = document.getElementById('nav-drawer');
@@ -3691,9 +4998,146 @@
         navWrap.dataset.open = String(open);
         navMenu.setAttribute('aria-expanded', String(open));
         navDrawer.setAttribute('aria-hidden', String(!open));
+        navDrawer.inert = !open;
       };
       if (navMenu) navMenu.addEventListener('click', () => setNavOpen(navWrap.dataset.open !== 'true'));
       if (navDrawer) navDrawer.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setNavOpen(false)));
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && navWrap?.dataset.open === 'true') {
+          setNavOpen(false);
+          navMenu?.focus();
+        }
+      });
+      setNavOpen(false);
+
+      const pageRoot = document.documentElement;
+      const heroScene = document.querySelector('.hero');
+      const journeyIndex = document.getElementById('journey-index');
+      const journeyLabel = document.getElementById('journey-label');
+      const journeyProgress = document.getElementById('journey-progress');
+      const proofBand = document.querySelector('.proof-band');
+      const sceneMeta = [
+        ['top', '00', 'ORBIT'],
+        ['experience', '01', 'EXPERIENCE'],
+        ['intelligence', '02', 'INTELLIGENCE'],
+        ['planner', '03', 'PLANNER'],
+        ['insights', '04', 'SIGNAL'],
+        ['outcomes', '06', 'OUTCOMES'],
+        ['faq', '07', 'ANSWERS']
+      ].map(([id, index, label]) => ({ id, index, label, el: document.getElementById(id) })).filter(scene => scene.el);
+      sceneMeta.forEach(scene => scene.el.classList.add('scroll-scene'));
+
+      let sceneFrame = 0;
+      const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+      const paintScrollScenes = () => {
+        sceneFrame = 0;
+        const viewport = innerHeight;
+        const range = Math.max(document.documentElement.scrollHeight - viewport, 1);
+        const pageProgress = clamp(scrollY / range);
+        progress.style.width = (pageProgress * 100).toFixed(3) + '%';
+        journeyProgress.style.transform = 'scaleY(' + pageProgress.toFixed(4) + ')';
+        navWrap.classList.toggle('is-scrolled', scrollY > 22);
+        document.body.classList.toggle('has-journey', scrollY > viewport * .68 && scrollY < range - viewport * .28);
+        if (proofBand) proofBand.style.setProperty('--proof-x', (12 + pageProgress * 76).toFixed(2) + '%');
+
+        if (heroScene && !reduce) {
+          const heroRange = Math.max(heroScene.offsetHeight - viewport * .35, 1);
+          const heroProgress = clamp(scrollY / heroRange);
+          heroScene.style.setProperty('--hero-copy-y', (-heroProgress * 94).toFixed(2) + 'px');
+          heroScene.style.setProperty('--hero-copy-opacity', clamp(1 - heroProgress * 1.42).toFixed(3));
+          heroScene.style.setProperty('--hero-stage-y', (-heroProgress * 128).toFixed(2) + 'px');
+          heroScene.style.setProperty('--hero-scale', (1 - heroProgress * .13).toFixed(4));
+          heroScene.style.setProperty('--hero-visual-opacity', clamp(1 - heroProgress * .72, .18, 1).toFixed(3));
+          heroScene.style.setProperty('--hero-grid-y', (heroProgress * 74).toFixed(2) + 'px');
+          heroScene.style.setProperty('--hero-path-y', (-heroProgress * 48).toFixed(2) + 'px');
+        }
+
+        let activeScene = sceneMeta[0];
+        sceneMeta.forEach(scene => {
+          const rect = scene.el.getBoundingClientRect();
+          const sceneProgress = clamp((viewport - rect.top) / (viewport + rect.height));
+          const shift = (0.5 - sceneProgress) * 52;
+          scene.el.style.setProperty('--scene-shift', shift.toFixed(2) + 'px');
+          scene.el.style.setProperty('--scene-shift-inverse', (-shift).toFixed(2) + 'px');
+          scene.el.style.setProperty('--scene-shift-soft', (shift * .36).toFixed(2) + 'px');
+          scene.el.style.setProperty('--scene-shift-x', (shift * .48).toFixed(2) + 'px');
+          scene.el.style.setProperty('--scene-shift-x-inverse', (-shift * .48).toFixed(2) + 'px');
+          const visible = rect.bottom > -viewport * .12 && rect.top < viewport * 1.12;
+          scene.el.classList.toggle('is-visible', visible);
+          if (rect.top <= viewport * .48) activeScene = scene;
+        });
+
+        if (activeScene) {
+          journeyIndex.textContent = activeScene.index;
+          journeyLabel.textContent = activeScene.label;
+          document.querySelectorAll('.nav-links a').forEach(link => {
+            link.classList.toggle('is-active', link.getAttribute('href') === '#' + activeScene.id);
+          });
+        }
+        document.body.classList.toggle('hero-away', heroScene && heroScene.getBoundingClientRect().bottom < 0);
+      };
+      const scheduleScenePaint = () => {
+        if (!sceneFrame) sceneFrame = requestAnimationFrame(paintScrollScenes);
+      };
+      addEventListener('scroll', scheduleScenePaint, { passive: true });
+      addEventListener('resize', scheduleScenePaint, { passive: true });
+      paintScrollScenes();
+
+      document.querySelectorAll('main section, main .chapter').forEach(section => {
+        section.querySelectorAll('.reveal').forEach((element, index) => {
+          element.style.setProperty('--reveal-delay', Math.min(index * 45, 135) + 'ms');
+        });
+      });
+
+      document.querySelectorAll('.showcase, .ai-workspace, .planner-stage, .principle, .story-large, .result, .cta').forEach(card => {
+        card.dataset.spotlight = '';
+        const glow = document.createElement('i');
+        glow.className = 'spotlight-glow';
+        glow.setAttribute('aria-hidden', 'true');
+        card.prepend(glow);
+        let spotlightFrame = 0;
+        let spotX = 0;
+        let spotY = 0;
+        card.addEventListener('pointermove', event => {
+          spotX = event.clientX;
+          spotY = event.clientY;
+          if (spotlightFrame) return;
+          spotlightFrame = requestAnimationFrame(() => {
+            spotlightFrame = 0;
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--spot-x', (spotX - rect.left) + 'px');
+            card.style.setProperty('--spot-y', (spotY - rect.top) + 'px');
+          });
+        }, { passive: true });
+      });
+
+      document.querySelectorAll('.console-modes, .ai-prompt-options').forEach(tablist => {
+        const tabs = [...tablist.querySelectorAll('button')];
+        const consoleTabs = tablist.classList.contains('console-modes');
+        const panelId = consoleTabs ? 'console-panel' : 'ai-demo-panel';
+        const panel = document.getElementById(panelId);
+        tabs.forEach((tab, index) => {
+          tab.id = (consoleTabs ? 'console-tab-' : 'ai-demo-tab-') + index;
+          tab.setAttribute('role', 'tab');
+          tab.setAttribute('aria-controls', panelId);
+          tab.tabIndex = tab.classList.contains('is-active') ? 0 : -1;
+          tab.addEventListener('click', () => panel?.setAttribute('aria-labelledby', tab.id));
+          tab.addEventListener('keydown', event => {
+            let targetIndex = index;
+            if (event.key === 'ArrowRight') targetIndex = (index + 1) % tabs.length;
+            else if (event.key === 'ArrowLeft') targetIndex = (index - 1 + tabs.length) % tabs.length;
+            else if (event.key === 'Home') targetIndex = 0;
+            else if (event.key === 'End') targetIndex = tabs.length - 1;
+            else return;
+            event.preventDefault();
+            tabs[targetIndex].focus();
+            tabs[targetIndex].click();
+          });
+        });
+        const selectedTab = tabs.find(tab => tab.classList.contains('is-active')) || tabs[0];
+        if (selectedTab) panel?.setAttribute('aria-labelledby', selectedTab.id);
+      });
+      document.querySelectorAll('.flash-card').forEach(card => card.setAttribute('aria-pressed', 'false'));
       const typed = document.getElementById('typed-response');
       const flashDeck = document.getElementById('flash-deck');
       const aiQuestion = document.querySelector('[data-ai-question]');
@@ -3742,11 +5186,16 @@
           const active = option.dataset.aiPreset === key;
           option.classList.toggle('is-active', active);
           option.setAttribute('aria-selected', String(active));
+          option.tabIndex = active ? 0 : -1;
         });
         typeResponse(preset.response);
       };
-      document.querySelectorAll('.ai-prompt-option').forEach(option => option.addEventListener('click', () => applyAiPreset(option.dataset.aiPreset)));
-      setTimeout(() => applyAiPreset('plan'), 650);
+      let aiPresetTouched = false;
+      document.querySelectorAll('.ai-prompt-option').forEach(option => option.addEventListener('click', () => {
+        aiPresetTouched = true;
+        applyAiPreset(option.dataset.aiPreset);
+      }));
+      setTimeout(() => { if (!aiPresetTouched) applyAiPreset('plan'); }, 650);
       document.querySelectorAll('.ai-chip').forEach((chip, index) => chip.addEventListener('click', () => {
         document.querySelectorAll('.ai-chip').forEach(other => other.classList.remove('active'));
         chip.classList.add('active'); flashDeck.classList.add('deployed');
@@ -3774,9 +5223,37 @@
           const active = mode.dataset.consoleMode === key;
           mode.classList.toggle('is-active', active);
           mode.setAttribute('aria-selected', String(active));
+          mode.tabIndex = active ? 0 : -1;
         });
       };
       document.querySelectorAll('.console-mode').forEach(mode => mode.addEventListener('click', () => applyConsoleState(mode.dataset.consoleMode)));
+
+      const metricObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const metric = entry.target;
+        metricObserver.unobserve(metric);
+        const finalText = metric.dataset.metricValue || metric.textContent.trim();
+        metric.dataset.metricValue = finalText;
+        const numeric = parseFloat(finalText);
+        const suffix = finalText.replace(/^[\d.]+/, '');
+        if (!Number.isFinite(numeric) || reduce) {
+          metric.textContent = finalText;
+          return;
+        }
+        const started = performance.now();
+        const duration = 1250;
+        const decimals = (String(numeric).split('.')[1] || '').length;
+        const tick = now => {
+          const elapsed = clamp((now - started) / duration);
+          const eased = 1 - Math.pow(1 - elapsed, 4);
+          metric.textContent = (numeric * eased).toFixed(decimals) + suffix;
+          if (elapsed < 1) requestAnimationFrame(tick);
+          else metric.textContent = finalText;
+        };
+        requestAnimationFrame(tick);
+      }), { threshold: .55 });
+      document.querySelectorAll('.result .big-number').forEach(metric => metricObserver.observe(metric));
+
       const heroClock = document.getElementById('hero-clock');
       const heroFocusTopic = document.getElementById('hero-focus-topic');
       const heroReadiness = document.getElementById('hero-readiness');
@@ -3795,12 +5272,16 @@
         }, 5200);
       }
       const root = document.documentElement, sphere = document.querySelector('.sphere');
-      let pointerX = innerWidth / 2, pointerY = innerHeight / 2, targetRx = 0, targetRy = 0, heroInView = true, orbitFrame = 0;
+      let pointerX = innerWidth / 2, pointerY = innerHeight / 2, targetRx = 0, targetRy = 0, heroInView = true, orbitFrame = 0, pointerFrame = 0;
       const canAnimateHero = () => !reduce && heroInView && !document.hidden;
       addEventListener('pointermove', event => {
         pointerX = event.clientX; pointerY = event.clientY;
-        root.style.setProperty('--mx', pointerX + 'px'); root.style.setProperty('--my', pointerY + 'px');
         targetRx = (pointerY / innerHeight - .5) * -13; targetRy = (pointerX / innerWidth - .5) * 18;
+        if (!pointerFrame) pointerFrame = requestAnimationFrame(() => {
+          pointerFrame = 0;
+          root.style.setProperty('--mx', pointerX + 'px');
+          root.style.setProperty('--my', pointerY + 'px');
+        });
       }, { passive: true });
       const orbit = time => { orbitFrame = 0; if (sphere && canAnimateHero()) { sphere.style.setProperty('--rx', (targetRx + Math.sin(time * .00075) * 2.2) + 'deg'); sphere.style.setProperty('--ry', (targetRy + Math.cos(time * .00053) * 3.2) + 'deg'); orbitFrame = requestAnimationFrame(orbit); } };
       if (!reduce) orbitFrame = requestAnimationFrame(orbit);
@@ -3813,8 +5294,8 @@
         card.addEventListener('pointerleave', () => card.style.transform = '');
       });
       const canvas = document.getElementById('particles'), ctx = canvas.getContext('2d'); let points = [], particleFrame = 0;
-      function size() { canvas.width = innerWidth * devicePixelRatio; canvas.height = innerHeight * devicePixelRatio; canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px'; ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); const amount = Math.min(90, Math.round(innerWidth / 16)); points = Array.from({ length: amount }, () => ({ x: Math.random() * innerWidth, y: Math.random() * Math.min(innerHeight, 920), r: Math.random() * 1.1 + .15, s: Math.random() * .12 + .015 })); }
-      function draw() { particleFrame = 0; if (!ctx) return; ctx.clearRect(0, 0, innerWidth, innerHeight); points.forEach((p, index) => { p.y -= p.s; if (p.y < 0) { p.y = Math.min(innerHeight, 920); p.x = Math.random() * innerWidth; } const dx = p.x - pointerX, dy = p.y - pointerY, d = Math.hypot(dx, dy); if (d < 130) { p.x += dx / d * .12; p.y += dy / d * .12; } for (let next = index + 1; next < points.length; next++) { const q = points[next], gap = Math.hypot(p.x - q.x, p.y - q.y); if (gap < 75) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.strokeStyle = 'rgba(255,255,255,' + ((75 - gap) / 130) + ')'; ctx.lineWidth = .45; ctx.stroke(); } } ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,' + (d < 160 ? .32 : .12) + ')'; ctx.fill(); }); if (canAnimateHero()) particleFrame = requestAnimationFrame(draw); }
+      function size() { const dpr = Math.min(devicePixelRatio || 1, 1.5); canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr; canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); const amount = Math.min(82, Math.round(innerWidth / 18)); points = Array.from({ length: amount }, () => ({ x: Math.random() * innerWidth, y: Math.random() * Math.min(innerHeight, 920), r: Math.random() * 1.1 + .15, s: Math.random() * .12 + .015 })); }
+      function draw() { particleFrame = 0; if (!ctx) return; ctx.clearRect(0, 0, innerWidth, innerHeight); points.forEach((p, index) => { p.y -= p.s; if (p.y < 0) { p.y = Math.min(innerHeight, 920); p.x = Math.random() * innerWidth; } const dx = p.x - pointerX, dy = p.y - pointerY, d = Math.hypot(dx, dy); if (d < 130 && d > .001) { p.x += dx / d * .12; p.y += dy / d * .12; } for (let next = index + 1; next < points.length; next++) { const q = points[next], gap = Math.hypot(p.x - q.x, p.y - q.y); if (gap < 75) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.strokeStyle = 'rgba(185,232,245,' + ((75 - gap) / 175) + ')'; ctx.lineWidth = .42; ctx.stroke(); } } ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(226,241,244,' + (d < 160 ? .3 : .1) + ')'; ctx.fill(); }); if (canAnimateHero()) particleFrame = requestAnimationFrame(draw); }
       const resumeHeroMotion = () => { if (canAnimateHero()) { if (sphere && !orbitFrame) orbitFrame = requestAnimationFrame(orbit); if (ctx && !particleFrame) particleFrame = requestAnimationFrame(draw); } };
       if (ctx) { size(); if (reduce) draw(); else particleFrame = requestAnimationFrame(draw); addEventListener('resize', size, { passive: true }); }
       const heroSection = document.querySelector('.hero');
@@ -3827,6 +5308,7 @@
       // The browser never receives the provider key; the local API reads it from .env.
       const apiBase = location.protocol === 'file:' ? 'http://127.0.0.1:8001' : '';
       const chatRoot = document.getElementById('ai-chat');
+      const chatPanel = chatRoot.querySelector('.chat-panel');
       const chatLaunch = document.getElementById('chat-launch');
       const chatClose = document.querySelector('[data-chat-close]');
       const chatMessagesEl = document.getElementById('chat-messages');
@@ -3842,9 +5324,18 @@
       let chatOpener = null;
       const setChatOpen = (open, opener = document.activeElement) => {
         if (open) chatOpener = opener;
+        if (open) setNavOpen(false);
         chatRoot.dataset.open = String(open);
         chatLaunch.setAttribute('aria-expanded', String(open));
         chatLaunch.setAttribute('aria-label', open ? 'Close ExamSphere AI' : 'Open ExamSphere AI');
+        chatLaunch.tabIndex = open ? -1 : 0;
+        chatPanel.setAttribute('aria-modal', String(open));
+        chatPanel.setAttribute('aria-hidden', String(!open));
+        chatPanel.inert = !open;
+        document.body.classList.toggle('chat-open', open);
+        document.getElementById('main').inert = open;
+        document.querySelector('.footer').inert = open;
+        navWrap.inert = open;
         if (open) {
           setTimeout(() => {
             const onboarding = document.getElementById('chat-onboarding');
@@ -3855,6 +5346,7 @@
           setTimeout(() => chatOpener.focus(), 80);
         }
       };
+      setChatOpen(false);
       const addChatMessage = (role, content, isTyping = false) => {
         const bubble = document.createElement('div');
         bubble.className = 'chat-bubble ' + (role === 'user' ? 'user' : 'assistant') + (isTyping ? ' chat-typing' : '');
@@ -3906,7 +5398,27 @@
       document.querySelectorAll('[data-chat-trigger]').forEach(trigger => trigger.addEventListener('click', event => {
         event.preventDefault(); setChatOpen(true, trigger);
       }));
-      document.addEventListener('keydown', event => { if (event.key === 'Escape' && chatRoot.dataset.open === 'true') setChatOpen(false); });
+      document.addEventListener('keydown', event => {
+        if (chatRoot.dataset.open !== 'true') return;
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          setChatOpen(false);
+          return;
+        }
+        if (event.key !== 'Tab') return;
+        const focusable = [...chatPanel.querySelectorAll('button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')]
+          .filter(element => !element.closest('.chat-hidden') && element.getClientRects().length);
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
       chatReset.addEventListener('click', clearChat);
       chatForm.addEventListener('submit', async event => {
         event.preventDefault();
@@ -3922,7 +5434,7 @@
           const response = await fetch(apiBase + '/api/ai/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messages: chatHistory })
+            body: JSON.stringify({ messages: chatHistory.slice(-16) })
           });
           const data = await response.json().catch(() => ({}));
           if (!response.ok) throw new Error(data.detail || 'The AI workspace is unavailable right now.');
